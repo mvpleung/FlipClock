@@ -48,9 +48,9 @@ Base.extend = function(_instance, _static) {
   // create the wrapper for the constructor function
   //var constructor = proto.constructor.valueOf(); //-dean
   var constructor = proto.constructor;
-  var klass = (proto.constructor = function() {
+  var klass = proto.constructor = function() {
     if (!Base._prototyping) {
-      if (this._constructing || this.constructor == klass) {
+      if (this._constructing || this.constructor === klass) {
         // instantiation
         this._constructing = true;
         constructor.apply(this, arguments);
@@ -60,7 +60,7 @@ Base.extend = function(_instance, _static) {
         return (arguments[0].extend || extend).call(arguments[0], proto);
       }
     }
-  });
+  };
 
   // build the class interface
   klass.ancestor = this;
@@ -72,12 +72,12 @@ Base.extend = function(_instance, _static) {
   klass.prototype = proto;
   klass.toString = this.toString;
   klass.valueOf = function(type) {
-    //return (type == "object") ? klass : constructor; //-dean
-    return type == 'object' ? klass : constructor.valueOf();
+    //return (type === "object") ? klass : constructor; //-dean
+    return type === 'object' ? klass : constructor.valueOf();
   };
   extend.call(klass, _static);
   // class initialisation
-  if (typeof klass.init == 'function') klass.init();
+  if (typeof klass.init === 'function') klass.init();
   return klass;
 };
 
@@ -88,9 +88,9 @@ Base.prototype = {
       var ancestor = this[source];
       if (
         ancestor &&
-        typeof value == 'function' && // overriding a method?
+        typeof value === 'function' && // overriding a method?
         // the valueOf() comparison is to avoid circular references
-        (!ancestor.valueOf || ancestor.valueOf() != value.valueOf()) &&
+        (!ancestor.valueOf || ancestor.valueOf() !== value.valueOf()) &&
         /\bbase\b/.test(value)
       ) {
         // get the underlying method
@@ -105,7 +105,7 @@ Base.prototype = {
         };
         // point to the underlying method
         value.valueOf = function(type) {
-          return type == 'object' ? value : method;
+          return type === 'object' ? value : method;
         };
         value.toString = Base.toString;
       }
@@ -114,7 +114,7 @@ Base.prototype = {
       // extending with an object literal
       var extend = Base.prototype.extend;
       // if this object has a customised extend method then use it
-      if (!Base._prototyping && typeof this != 'function') {
+      if (!Base._prototyping && typeof this !== 'function') {
         extend = this.extend || extend;
       }
       var proto = { toSource: null };
@@ -122,8 +122,8 @@ Base.prototype = {
       var hidden = ['constructor', 'toString', 'valueOf'];
       // if we are prototyping then include the constructor
       var i = Base._prototyping ? 0 : 1;
-      while ((key = hidden[i++])) {
-        if (source[key] != proto[key]) {
+      while (key = hidden[i++]) {
+        if (source[key] !== proto[key]) {
           extend.call(this, key, source[key]);
         }
       }
@@ -157,7 +157,7 @@ Base = Base.extend(
 
     implement: function() {
       for (var i = 0; i < arguments.length; i++) {
-        if (typeof arguments[i] == 'function') {
+        if (typeof arguments[i] === 'function') {
           // if it's a function, call it
           arguments[i](this.prototype);
         } else {
@@ -414,7 +414,7 @@ var FlipClock;
      */
 
     createDivider: function(label, css, excludeDots) {
-      if (typeof css == 'boolean' || !css) {
+      if (typeof css === 'boolean' || !css) {
         excludeDots = css;
         css = label;
       }
@@ -549,7 +549,7 @@ var FlipClock;
      */
 
     decrement: function() {
-      if (this.factory.time.getTimeSeconds() == 0) {
+      if (this.factory.time.getTimeSeconds() === 0) {
         this.factory.stop();
       } else {
         this.factory.time.subSecond();
@@ -567,7 +567,7 @@ var FlipClock;
         var list = t.lists[i];
 
         if (list) {
-          if (!doNotAddPlayClass && digit != list.digit) {
+          if (!doNotAddPlayClass && digit !== list.digit) {
             list.play();
           }
 
@@ -853,7 +853,7 @@ var FlipClock;
 
       var lindex = index.toLowerCase();
 
-      if (typeof obj == 'object') {
+      if (typeof obj === 'object') {
         lang = obj;
       }
 
@@ -871,7 +871,7 @@ var FlipClock;
     start: function(callback) {
       var t = this;
 
-      if (!t.running && (!t.countdown || (t.countdown && t.time.time > 0))) {
+      if (!t.running && (!t.countdown || t.countdown && t.time.time > 0)) {
         t.face.start(t.time);
         t.timer.start(function() {
           t.flip();
@@ -935,7 +935,7 @@ var FlipClock;
     setCountdown: function(value) {
       var running = this.running;
 
-      this.countdown = value ? true : false;
+      this.countdown = Boolean(value);
 
       if (running) {
         this.stop();
@@ -1062,7 +1062,7 @@ var FlipClock;
         this.digit = digit;
       }
 
-      if (this.digit != this.lastDigit) {
+      if (this.digit !== this.lastDigit) {
         var $delete = this.$el.querySelector('.' + this.classes.before);
         $delete && $delete.classList.remove(this.classes.before);
 
@@ -1149,11 +1149,11 @@ var FlipClock;
     },
 
     getNextDigit: function() {
-      return this.digit == 9 ? 0 : this.digit + 1;
+      return this.digit === 9 ? 0 : this.digit + 1;
     },
 
     getPrevDigit: function() {
-      return this.digit == 0 ? 9 : this.digit - 1;
+      return this.digit === 0 ? 9 : this.digit - 1;
     }
   });
 })();
@@ -1221,7 +1221,7 @@ var FlipClock;
      */
 
     constructor: function(factory, time, options) {
-      if (typeof options != 'object') {
+      if (typeof options !== 'object') {
         options = {};
       }
 
@@ -1290,7 +1290,7 @@ var FlipClock;
       obj.forEach(function(value, i) {
         value = value.toString();
 
-        if (value.length == 1) {
+        if (value.length === 1) {
           value = '0' + value;
         }
 
@@ -1470,12 +1470,10 @@ var FlipClock;
             this.time.getTime() / 1000 - date.getTime() / 1000,
             0
           );
-        } else {
-          return date.getTime() / 1000 - this.time.getTime() / 1000;
         }
-      } else {
-        return this.time;
+        return date.getTime() / 1000 - this.time.getTime() / 1000;
       }
+      return this.time;
     },
 
     /**
@@ -1496,7 +1494,6 @@ var FlipClock;
       console.log(date);
 
       var hours = date.getHours();
-      var merid = hours > 12 ? 'PM' : 'AM';
       var data = [
         hours > 12 ? hours - 12 : hours === 0 ? 12 : hours,
         date.getMinutes()
@@ -1520,7 +1517,7 @@ var FlipClock;
       var seconds = this.getTimeSeconds();
 
       if (mod) {
-        if (seconds == 60) {
+        if (seconds === 60) {
           seconds = 0;
         } else {
           seconds = seconds % 60;
@@ -1874,9 +1871,9 @@ var FlipClock;
         );
       }
 
-      var time = time
-        ? time
-        : this.factory.time.getMilitaryTime(false, this.showSeconds);
+      time = time ?
+        time :
+        this.factory.time.getMilitaryTime(false, this.showSeconds);
 
       if (time.length > children.length) {
         time.forEach(function(digit, i) {
@@ -1906,9 +1903,9 @@ var FlipClock;
     flip: function(time, doNotAddPlayClass) {
       this.autoIncrement();
 
-      time = time
-        ? time
-        : this.factory.time.getMilitaryTime(false, this.showSeconds);
+      time = time ?
+        time :
+        this.factory.time.getMilitaryTime(false, this.showSeconds);
 
       this.base(time, doNotAddPlayClass);
     }
@@ -1940,11 +1937,11 @@ var FlipClock;
      */
 
     constructor: function(factory, options) {
-      if (typeof options != 'object') {
+      if (typeof options !== 'object') {
         options = {};
       }
 
-      factory.autoStart = options.autoStart ? true : false;
+      factory.autoStart = options.autoStart;
 
       if (options.autoStart) {
         this.shouldAutoIncrement = true;
@@ -2273,8 +2270,6 @@ var FlipClock;
      */
 
     build: function() {
-      var t = this;
-
       var time = this.factory.time.getTime(false, this.showSeconds);
 
       this.base(time);
@@ -2297,7 +2292,7 @@ var FlipClock;
      */
 
     flip: function(time, doNotAddPlayClass) {
-      if (this.meridiumText != this.getMeridium()) {
+      if (this.meridiumText !== this.getMeridium()) {
         this.meridiumText = this.getMeridium();
         this.meridium.find('a').html(this.meridiumText);
       }
@@ -2324,7 +2319,7 @@ var FlipClock;
      */
 
     isPM: function() {
-      return this.getMeridium() == 'PM' ? true : false;
+      return this.getMeridium() === 'PM';
     },
 
     /**
@@ -2334,7 +2329,7 @@ var FlipClock;
      */
 
     isAM: function() {
-      return this.getMeridium() == 'AM' ? true : false;
+      return this.getMeridium() === 'AM';
     }
   });
 })();
